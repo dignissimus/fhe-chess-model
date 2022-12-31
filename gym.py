@@ -1,3 +1,4 @@
+import numpy as np
 import chess
 import chess.engine
 import fhebot
@@ -15,7 +16,9 @@ def stockfish_evaluate():
     pass
 
 
-def generate_positions(weights):
+def generate_positions(data):
+    weights, seed = data
+    np.random.seed(seed)
     stockfish = chess.engine.SimpleEngine.popen_uci("stockfish")
     positions = []
     evaluations = []
@@ -42,7 +45,7 @@ def main():
     for iteration in range(ITERATIONS):
         with Pool(8) as pool:
             for p, e in tqdm(
-                pool.imap_unordered(generate_positions, [weights] * GAMES), total=GAMES
+                pool.imap_unordered(generate_positions, [(weights, np.random.randint(0, 100000)) for _ in range(GAMES)]), total=GAMES
             ):
                 positions += p
                 evaluations += e
