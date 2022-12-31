@@ -6,9 +6,9 @@ from multiprocessing import Pool
 from tqdm import tqdm
 from sklearn.linear_model import LogisticRegression
 
-ITERATIONS = 5
+ITERATIONS = 10
 GAMES = 1000
-GAME_LENGTH = 80
+GAME_LENGTH = 40
 
 
 def stockfish_evaluate():
@@ -51,8 +51,15 @@ def main():
             model.score(positions, [1 if e >= 0 else 0 for e in evaluations]),
         )
         weights = model.coef_[0]
+
         with open(f"weights-{iteration}.json", "w") as file:
             json.dump(weights.tolist(), file)
+
+        with open(f"positions.json", "w") as file:
+            json.dump(positions)
+
+        with open(f"evaluations.json", "w") as file:
+            json.dump(evaluations, file)
 
 
 if __name__ == "__main__":
