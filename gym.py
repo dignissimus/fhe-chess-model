@@ -21,7 +21,7 @@ def generate_positions(weights):
     evaluations = []
     board = chess.Board()
     for i in range(GAME_LENGTH):
-        board.push(fhebot.nextmove(weights, board, 2).move)
+        board.push(fhebot.nextmove(weights, board, 2, rng=True).move)
         positions.append(fhebot.serialise_position(board))
         info = stockfish.analyse(board, chess.engine.Limit(time=0.1))
         evaluations.append(info["score"].white().score(mate_score=1000))
