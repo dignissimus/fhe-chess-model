@@ -21,7 +21,7 @@ def generate_positions(weights):
     evaluations = []
     board = chess.Board()
     for i in range(GAME_LENGTH):
-        evaluation = fhebot.nextmove(weights, board, 2, rng)
+        evaluation = fhebot.nextmove(weights, board, 2, rng=True)
         if evaluation.move is None:
             break
         board.push(evaluation.move)
@@ -48,13 +48,16 @@ def main():
                 evaluations += e
 
         model = LogisticRegression(max_iter=10000)
-        model = model.fit(positions, [1 if e >= 0 else 0 for e in evaluations])
+        model = model.fit(
+            positions,
+            [1 if e + np.random.normal(0, 0.001) > 0 else 0 for e in evaluations],
+        )
         print(
             f"Iteration {iteration + 1}",
-            model.score(positions, [1 if e >= 0 else 0 for e in evaluations]),
+            model.score(positions, [1 if e > 0 else 0 for e in evaluations]),
         )
 
-        weights = 18 * model.coef_[0] / np.max(np.abs(model.coef_[0]))
+        weights = 15 * model.coef_[0] / np.max(np.abs(model.coef_[0]))
 
         with open(f"weights-{iteration}.json", "w") as file:
             json.dump(weights.tolist(), file)
