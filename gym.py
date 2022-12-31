@@ -21,7 +21,10 @@ def generate_positions(weights):
     evaluations = []
     board = chess.Board()
     for i in range(GAME_LENGTH):
-        board.push(fhebot.nextmove(weights, board, 2, rng=True).move)
+        evaluation = fhebot.nextmove(weights, board, 2, rng)
+        if evaluation.move is None:
+            break
+        board.push(evaluation.move)
         positions.append(fhebot.serialise_position(board))
         info = stockfish.analyse(board, chess.engine.Limit(time=0.1))
         evaluations.append(info["score"].white().score(mate_score=1000))
@@ -50,7 +53,8 @@ def main():
             f"Iteration {iteration + 1}",
             model.score(positions, [1 if e >= 0 else 0 for e in evaluations]),
         )
-        weights = model.coef_[0]
+
+        weights = 18 * model.coef_[0] / np.max(np.abs(model.coef_[0]))
 
         with open(f"weights-{iteration}.json", "w") as file:
             json.dump(weights.tolist(), file)
