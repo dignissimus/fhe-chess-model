@@ -7,7 +7,7 @@ from tqdm import tqdm
 from sklearn.linear_model import LogisticRegression
 
 ITERATIONS = 10
-GAMES = 1000
+GAMES = 100
 GAME_LENGTH = 40
 
 
@@ -44,7 +44,7 @@ def main():
                 positions += p
                 evaluations += e
 
-        model = LogisticRegression()
+        model = LogisticRegression(max_iter=10000)
         model = model.fit(positions, [1 if e >= 0 else 0 for e in evaluations])
         print(
             f"Iteration {iteration + 1}",
@@ -56,7 +56,7 @@ def main():
             json.dump(weights.tolist(), file)
 
         with open(f"positions.json", "w") as file:
-            json.dump(positions)
+            json.dump(positions, file)
 
         with open(f"evaluations.json", "w") as file:
             json.dump(evaluations, file)
